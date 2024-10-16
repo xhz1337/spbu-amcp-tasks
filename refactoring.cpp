@@ -10,11 +10,11 @@ int main()
 {
     for (int i = 0; i < 3; i++)
     {
-        int array[N];
-        fillArray(array, N);
-        std::cout << "Последовательность #" << i << std::endl;
-        printArray(array, N);
-        std::cout << "Среднее последовательности: " << arrayArithmeticAvg(array, N) << std::endl;
+        int array[arrayLen];
+        fillArray(array, arrayLen);
+        std::cout << "Последовательность #" << i + 1 << std::endl;
+        printArray(array, arrayLen);
+        std::cout << "Среднее последовательности: " << arrayArithmeticAvg(array, arrayLen) << std::endl;
     }
     return 0;
 }
