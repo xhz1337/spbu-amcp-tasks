@@ -6,6 +6,7 @@ void fillArray(int *array, const int &arrayLen);
 void printArray(int *array, const int &arrayLen);
 
 const int arrayLen = 10;
+
 int main()
 {
     for (int i = 0; i < 3; i++)
