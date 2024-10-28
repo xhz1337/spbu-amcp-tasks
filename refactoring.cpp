@@ -1,7 +1,7 @@
 #include <cmath>
 #include <iostream>
 
-float calcArrayArithmeticAvg(const int* const arr, const int arrayLen);
+double calcArrayArithmeticAvg(const int* const arr, const int arrayLen);
 void fillArray(int const *array, const int arrayLen);
 void printArray(const int* const arr, const int arrayLen);
 
@@ -41,7 +41,7 @@ void printArray(const int* const arr, const int arrayLen);
     std::cout << std::endl;
 }
 
-float calcArrayArithmeticAvg(const int* const arr, const int arrayLen);
+double calcArrayArithmeticAvg(const int* const arr, const int arrayLen);
 {
     float arrayElemSum = 0;
     for (int i = 0; i < arrayLen; i++)
