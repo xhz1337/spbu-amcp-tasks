@@ -2,13 +2,13 @@
 #include "menu_functions.hpp"
 
 const mmh::MenuItem mmh::DATA_BASE = {
-    "1 - базы данных", mmh::data_base, &mmh::STUDY };
+    "1 - Р±Р°Р·С‹ РґР°РЅРЅС‹С…", mmh::data_base, &mmh::STUDY_OTHER_TECHNOLOGIES };
 const mmh::MenuItem mmh::MULTISTREAM_PROG = {
-    "2 - многопоточное программирование", mmh::multistream_prog, &mmh::STUDY };
+    "2 - РјРЅРѕРіРѕРїРѕС‚РѕС‡РЅРѕРµ РїСЂРѕРіСЂР°РјРјРёСЂРѕРІР°РЅРёРµ", mmh::multistream_prog, &mmh::STUDY_OTHER_TECHNOLOGIES };
 const mmh::MenuItem mmh::WEB_TECH = {
-    "3 - сетевые технологии", mmh::web_tech, &mmh::STUDY };
+    "3 - СЃРµС‚РµРІС‹Рµ С‚РµС…РЅРѕР»РѕРіРёРё", mmh::web_tech, &mmh::STUDY_OTHER_TECHNOLOGIES };
 const mmh::MenuItem mmh::OTHER_GO_BACK = {
-    "0 - выход в предыдущее меню", mmh::other_go_back, &mmh::STUDY };
+    "0 - РІС‹С…РѕРґ РІ РїСЂРµРґС‹РґСѓС‰РµРµ РјРµРЅСЋ", mmh::go_back, &mmh::STUDY_OTHER_TECHNOLOGIES };
 
 namespace
 {
@@ -21,13 +21,13 @@ namespace
 }
 
 const mmh::MenuItem mmh::STUDY_PROG_LANG = {
-    "1 - изучать языки программирования", mmh::study_prog_lang, &mmh::STUDY };
+    "1 - РёР·СѓС‡Р°С‚СЊ СЏР·С‹РєРё РїСЂРѕРіСЂР°РјРјРёСЂРѕРІР°РЅРёСЏ", mmh::study_prog_lang, &mmh::STUDY };
 const mmh::MenuItem mmh::STUDY_ALGORITHMS = {
-    "2 - алгоритмы и структуры", mmh::study_algorithms, &mmh::STUDY };
+    "2 - Р°Р»РіРѕСЂРёС‚РјС‹ Рё СЃС‚СЂСѓРєС‚СѓСЂС‹", mmh::study_algorithms, &mmh::STUDY };
 const mmh::MenuItem mmh::STUDY_OTHER_TECHNOLOGIES = {
-    "3 - другие технологии", mmh::study_other_technologies, &mmh::STUDY, other_children, other_size};
+    "3 - РґСЂСѓРіРёРµ С‚РµС…РЅРѕР»РѕРіРёРё", mmh::show_menu, &mmh::STUDY, other_children, other_size };
 const mmh::MenuItem mmh::STUDY_GO_BACK = {
-    "0 - выйти в главное меню", mmh::study_go_back, &mmh::STUDY };
+    "0 - РІС‹Р№С‚Рё РІ РіР»Р°РІРЅРѕРµ РјРµРЅСЋ", mmh::go_back, &mmh::STUDY };
 
 namespace
 {
@@ -40,9 +40,9 @@ namespace
 }
 
 const mmh::MenuItem mmh::STUDY = {
-    "1 - изучать программирование", mmh::show_menu, &mmh::MAIN, study_children, study_size };
+    "1 - РёР·СѓС‡Р°С‚СЊ РїСЂРѕРіСЂР°РјРјРёСЂРѕРІР°РЅРёРµ", mmh::show_menu, &mmh::MAIN, study_children, study_size };
 const mmh::MenuItem mmh::EXIT = {
-    "0 - пойти играть в футбол", mmh::exit, &mmh::MAIN };
+    "0 - РїРѕР№С‚Рё РёРіСЂР°С‚СЊ РІ С„СѓС‚Р±РѕР»", mmh::exit, &mmh::MAIN };
 
 namespace
 {
