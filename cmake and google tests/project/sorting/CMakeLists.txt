@@ -1,4 +1,4 @@
-project(sort)
+project(sorting)
 
 set(HEADERS
     source/generate.hpp

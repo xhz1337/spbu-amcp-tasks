@@ -3,7 +3,12 @@
 
 namespace mmh
 {
-    void print_array(const char *const comment, int *arr, const int size);
+    namespace io
+    {
+        int input_user_max_value();
+        int input_user_size();
+        void print_array(const char* const comment, const int * const arr, const int n);
+    }
 }
 
 #endif
