@@ -6,7 +6,7 @@ namespace mmh {
 	class LongNumber {
 		private:
 			int* numbers;
-			int length;
+			int len;
 			int sign;
 		
 		public:
