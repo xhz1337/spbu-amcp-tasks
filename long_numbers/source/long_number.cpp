@@ -2,96 +2,109 @@
 
 using mmh::LongNumber;
 		
-LongNumber::LongNumber() {
-    numbers_ = nullptr;
-    length_ = 0;
-    sign_ = POSITIVE;
+LongNumber::LongNumber() : length(1), sign(1) {
+	numbers = new int[length];
+	numbers[0] = 0;
 }
 
+
 LongNumber::LongNumber(const char* const str) {
-	length = get_length(str);
-	numbers = new int[length];
-	
-	if (str[0] == '-'){
+	int str_length = get_length(str);
+	if (str[0] == '-') {
 		sign = -1;
-		for (int i =1; i<length; i++){
-			numbers[i-1] = str [i]-'0';
-		}
+		length = str_length - 1;
 	} else {
 		sign = 1;
-		for (int i=0;i<length; i++){
-			numbers[i]=str[i]-'0';
-		}
+		length = str_length;
+	}
+	numbers = new int[length];
+	for (int i = 0; i < length; i++) {
+		numbers[i] = str[str_length - i - 1] - '0';
 	}
 }
 
 LongNumber::LongNumber(const LongNumber& x) {
-	// TODO
+	length = x.length;
+	sign = x.sign;
+	numbers = new int[length];
+	for (int i = 0; i < length; i++) numbers[i] = x.numbers[i];
 }
 
 LongNumber::LongNumber(LongNumber&& x) {
-	// TODO
+	length = x.length;
+	sign = x.sign;
+	numbers = x.numbers;
+	x.numbers = nullptr;
 }
 
 LongNumber::~LongNumber() {
-	// TODO
+	length = 0;
+	delete [] numbers;
+	numbers = nullptr;
 }
 
 LongNumber& LongNumber::operator = (const char* const str) {
-	// TODO
+	int str_len = get_length(str);
+	if (str[0] == '+') {
+		sign = 1;
+		length = str_len;
+	} else {
+		sign = -1;
+		length = str_len - 1;
+	}
+	delete [] numbers;
+	numbers = new int[length];
+	for (int i = 0; i < length; i++){
+		numbers[i] = str[str_len - i - 1] - '0';
+	}
+	return *this;
 }
 
-LongNumber& LongNumber::operator = (const LongNumber& x {
-	// TODO
+LongNumber& LongNumber::operator = (const LongNumber& x) {
+	if (this == &x) return *this;
+	length = x.length;
+	sign = x.sign;
+	delete [] numbers;
+	numbers = new int[length];
+	for (int i = 0; i < length; i++) numbers[i] = x.numbers[i];
+	return *this;
 }
 
 LongNumber& LongNumber::operator = (LongNumber&& x) {
-	// TODO
+	length = x.length;
+	sign = x.sign;
+	delete [] numbers;
+	numbers = x.numbers;
+	x.numbers = nullptr;
+	return *this;
 }
 
 bool LongNumber::operator == (const LongNumber& x) const {
-		if (sign != x.sign || length != x.length){
-		return false;
-	} else {
-	for(int i=0; i < length; i++){
-		if (numbers[i] != x.numbers[i]){
-			return false;
-		}
-	}else{
-		return true;
+	if (this == &x) return true;	
+	if (length != x.length) return false;
+	if (sign != x.sign) return false;
+	for (int i = 0; i < length; i++) {
+		if (numbers[i] != x.numbers[i]) return false;
 	}
-	}
+	return true;
 }
 
 bool LongNumber::operator != (const LongNumber& x) const {
-	if (sign != x.sign || length != x.length){
-		return true;
-	} else {
-		for( int i =0; i<length; i++){
-			if (numbers[i] != x.numbers[i]){
-				return true;
-			}
-		} else {
-			return false;
-		}
-	}
+	return !(*this == x);
 }
 
 bool LongNumber::operator > (const LongNumber& x) const {
 	if (sign != x.sign){
-		return sign>x.sign;
-	}
+		return sign > x.sign;
+	}	
 	if (length != x.length){
-		if (sign == 1){
-			return length > x.length;
-		}
+		if (sign == 1) return length > x.length;
 		return length < x.length;
+
 	}
-	for( int i = 0; i < length; i++){
-		if ( numbers[i] !=x.numbers[i]{
-			if (sign ==1){
-				return numbers[i] > x. numbers[i];
-			}
+	for (int i = 0; i < length; i++){
+		if (numbers[i] != x.numbers[i]){
+			if (sign == 1) return numbers[i] > x.numbers[i];
 			return numbers[i] < x.numbers[i];
 		}
 	}
@@ -103,26 +116,7 @@ bool LongNumber::operator < (const LongNumber& x) const {
 }
 
 LongNumber LongNumber::operator + (const LongNumber& x) const {
-	int max_len = std::max(length,x.length)+1;
-	int* result_numbers = new int[max_len]();
-	int i = length -1;
-	int j = x.length -1;
-	int k = max_len -1;
-	
-	while (i>=0 || j>=0 || carry){
-		int sum = carry;
-		if (i >= 0) sum += numbers[i--];
-		if (j >= 0) sum += x.numbers[j--];
-		result_numbers[k--] = sum % 10;
-		carry = sum/10;
-	}
-	
-	LongNumber result;
-    result.numbers = result_numbers + k + 1; 
-    result.length = max_len - (k + 1);
-    result.sign = 1;
-
-    return result;
+	// TODO
 }
 
 LongNumber LongNumber::operator - (const LongNumber& x) const {
@@ -134,7 +128,7 @@ LongNumber LongNumber::operator * (const LongNumber& x) const {
 }
 
 LongNumber LongNumber::operator / (const LongNumber& x) const {
-	// TODO
+	//TODO
 }
 
 LongNumber LongNumber::operator % (const LongNumber& x) const {
@@ -153,16 +147,10 @@ bool LongNumber::is_negative() const noexcept {
 	// TODO
 }
 
-// ----------------------------------------------------------
-// PRIVATE
-// ----------------------------------------------------------
 int LongNumber::get_length(const char* const str) const noexcept {
 	// TODO
 }
 
-// ----------------------------------------------------------
-// FRIENDLY
-// ----------------------------------------------------------
 namespace biv {
 	std::ostream& operator << (std::ostream &os, const LongNumber& x) {
 		// TODO
