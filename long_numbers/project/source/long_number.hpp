@@ -10,8 +10,8 @@ namespace mmh {
 			int sign;
 		
 		public:
-			LongNumber();
-			LongNumber(const char* const str);
+			LongNumber(); 
+			LongNumber(const char* const str); 
 			LongNumber(const LongNumber& x);
 			LongNumber(LongNumber&& x);
 			
