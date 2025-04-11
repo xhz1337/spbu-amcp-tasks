@@ -186,12 +186,61 @@ LongNumber LongNumber::operator - (const LongNumber& x) const {
 	rsum = *this + rsum;
 	return rsum;
 }
-LongNumber LongNumber::operator * (const LongNumber& x) const {
-	// TODO
-}
 
+LongNumber LongNumber::operator * (const LongNumber& x) const {
+	LongNumber power;
+	power.len = len + x.len;
+	power.sign = sign * x.sign;
+	for (int i = 0; i < x.len; i++) {
+		for (int j = 0; j < len; j++) {
+			power.numbers[j + i] += x.numbers[i] * numbers[j];
+			if (power.numbers[i + j] > 9){
+				int t = power.numbers[i + j] / 10;
+				power.numbers[i + j + 1] += t;
+				power.numbers[i + j] -= t * 10;
+			}
+		}
+	}
+	while (power.len > 1 && power.numbers[power.len - 1] == 0) {
+		power.len--;
+	}
+	
+	return power;
+}
 LongNumber LongNumber::operator / (const LongNumber& x) const {
-	//TODO
+	LongNumber res;
+	LongNumber divident = *this;
+	divident.sign = 1;
+	if (divident < x) {
+		return res;
+	} else {
+		res.len = len - x.len + 1;
+		res.sign = sign*x.sign;
+
+		for (int i = 0; i < res.len; i++) {
+			LongNumber divider;
+			divider.len = len - i;
+			divider.sign = 1;
+			
+			for (int j = 0; j < x.len; j++) {
+				divider.numbers[len - x.len - i + j] = x.numbers[j];
+			}
+			
+			int k = 0;
+			while (divident > divider || divident == divider) {
+				k++;
+				divident = divident - divider;
+			}
+			res.numbers[res.len - i - 1] = k;
+		}
+	}
+	
+	while (res.len > 1 && res.numbers[res.len - 1] == 0)
+	{
+		res.len--;
+	}
+	
+	return res;
 }
 
 LongNumber LongNumber::operator % (const LongNumber& x) const {
@@ -199,23 +248,32 @@ LongNumber LongNumber::operator % (const LongNumber& x) const {
 }
 
 int LongNumber::get_digits_number() const noexcept {
-	// TODO
+	return len;
 }
 
 int LongNumber::get_rank_number(int rank) const {
-	// TODO
+	return numbers[rank-1]
 }
 
 bool LongNumber::is_negative() const noexcept {
-	// TODO
+	return sign == 0;
 }
 
 int LongNumber::get_length(const char* const str) const noexcept {
-	// TODO
+	int l = 0;
+	while (str[len] != '\n') ++l;
+	return l;
+
 }
 
 namespace mmh {
 	std::ostream& operator << (std::ostream &os, const LongNumber& x) {
-		// TODO
+		if (x.sign == 0) {
+			os << '-';
+		}
+		for (int i = 0; i < x.len; i++) {
+			os << x.numbers[x.len - i - 1];
+		}
+		return os;
 	}
 }
