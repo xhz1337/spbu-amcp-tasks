@@ -242,7 +242,14 @@ namespace mmh {
 	}
 
 	LongNumber LongNumber::operator % (const LongNumber& x) const {
-		// TODO
+		if (is_negative()) {
+			LongNumber temp;
+			if (x.is_negative() == 1) temp = "1";
+			else temp = "-1";
+			return *this - (*this / x + temp) * x;
+		} else {
+			return *this - (*this / x) * x;
+		}
 	}
 
 	int LongNumber::get_digits_number() const noexcept {

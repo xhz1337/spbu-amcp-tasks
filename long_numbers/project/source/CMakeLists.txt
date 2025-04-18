@@ -1,4 +1,4 @@
-project(Long_numbers)
+project(long_numbers)
 
 set(SOURCES
         long_number.cpp
