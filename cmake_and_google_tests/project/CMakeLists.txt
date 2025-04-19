@@ -4,7 +4,7 @@ project(project)
 
 set(CMAKE_CXX_STANDARD 17)
 
-enable_testing()
+enable_testing()	
 add_subdirectory(lib/googletest)
 
 add_subdirectory(menu)

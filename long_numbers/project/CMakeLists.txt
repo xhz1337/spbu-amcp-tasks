@@ -4,5 +4,8 @@ project(ln)
 
 set(CMAKE_CXX_STANDARD 17)
 	
+enable_testing()
+add_subdirectory(lib/googletest)
+
 add_subdirectory(source)
 include_directories(source)
