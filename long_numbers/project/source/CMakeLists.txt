@@ -1,5 +1,3 @@
-project(long_numbers)
-
 set(SOURCES
         long_number.cpp
 )
@@ -8,4 +6,6 @@ set(HEADERS
         long_number.hpp
 )
 
-add_executable(${PROJECT_NAME} ${HEADERS} ${SOURCES}) 
+add_library(${LONG_NUMBER_LIB} ${HEADERS} ${SOURCES})   
+
+target_include_directories(${LONG_NUMBER_LIB} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

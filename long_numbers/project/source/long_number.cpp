@@ -174,8 +174,8 @@ namespace mmh {
 			while (sum.len > 1 && sum.numbers[sum.len - 1] == 0){ //cut zeros 
 				--sum.len;
 			} 
-			return sum;
 		}
+		return sum;
 	}
 
 	LongNumber LongNumber::operator - (const LongNumber& x) const {
@@ -237,7 +237,6 @@ namespace mmh {
 		{
 			res.len--;
 		}
-		
 		return res;
 	}
 
