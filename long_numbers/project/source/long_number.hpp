@@ -11,6 +11,7 @@ namespace mmh {
 		
 		public:
 			LongNumber(); 
+			LongNumber(int length, int sign);
 			LongNumber(const char* const str); 
 			LongNumber(const LongNumber& x);
 			LongNumber(LongNumber&& x);

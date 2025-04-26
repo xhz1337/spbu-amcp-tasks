@@ -6,14 +6,21 @@ namespace mmh {
 		numbers[0] = 0;
 	}
 
+	LongNumber::LongNumber(int len, int sign) : len(len), sign(sign) {
+		numbers = new int[len];
+		for (int i = 0; i < len; i++) {
+			numbers[i] = 0;
+		}
+	}
+
 	LongNumber::LongNumber(const char* const str) {
 		int str_len = get_length(str);
-		if (str[0] == '-') {
-			sign = -1;
-			len = str_len - 1;
-		} else {
+		if (str[0] == '+') {
 			sign = 1;
 			len = str_len;
+		} else {
+			sign = -1;
+			len = str_len - 1;
 		}
 		numbers = new int[len];
 		for (int i = 0; i < len; i++) {
