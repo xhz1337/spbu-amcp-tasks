@@ -1,9 +1,10 @@
 #include <gtest/gtest.h>
-#include "../source/long_number.hpp"	
+
+#include "long_number.hpp"
 
 using mmh::LongNumber;
- 
-/*TEST(default_constructor, rank) {
+
+TEST(default_constructor, rank) {
 	LongNumber x;
 	ASSERT_EQ(1, x.get_digits_number())
 		<< "По умолчанию число инициализируется нулём и иметь один разряд едениц.";
@@ -106,7 +107,7 @@ TEST(assignment, move) {
 		<< "Инициализировано число 1234567890.";
 	EXPECT_EQ(8, x.get_rank_number(3))
 		<< "Инициализировано число 1234567890. Третий разряд равен 8.";
-}*/
+}
 
 class FComparisons : public testing::Test {
 	public:

@@ -15,12 +15,13 @@ namespace mmh {
 
 	LongNumber::LongNumber(const char* const str) {
 		int str_len = get_length(str);
-		if (str[0] == '+') {
-			sign = 1;
-			len = str_len;
-		} else {
+		if (str[0] == '-') {
 			sign = -1;
 			len = str_len - 1;
+		} 
+		else { 	
+			sign = 1;
+			len = str_len;
 		}
 		numbers = new int[len];
 		for (int i = 0; i < len; i++) {
@@ -50,12 +51,13 @@ namespace mmh {
 
 	LongNumber& LongNumber::operator = (const char* const str) {
 		int str_len = get_length(str);
-		if (str[0] == '+') {
-			sign = 1;
-			len = str_len;
-		} else {
+		if (str[0] == '-') {
 			sign = -1;
 			len = str_len - 1;
+		} 
+		else {
+			sign = 1;
+			len = str_len;
 		}
 		delete [] numbers;
 		numbers = new int[len];
@@ -120,19 +122,17 @@ namespace mmh {
 
 	LongNumber LongNumber::operator + (const LongNumber& x) const {
 		LongNumber sum, min, max;
-		if (sign == x.sign){
+		if (sign * x.sign > 0){
 			if (len >= x.len){
+				sum = LongNumber(len + 1, sign);
 				max = *this;
 				min = x;
-				sum.len = len + 1;
-				sum.sign = sign;
 			}
 			else
 			{
+				sum = LongNumber(x.len + 1, sign);
 				max = x;
 				min = *this;
-				sum.len = x.len + 1;
-				sum.sign = x.sign;
 			}
 			for (int i = 0; i < min.len; i++)
 				sum.numbers[i] = min.numbers[i] + max.numbers[i]; 
@@ -140,30 +140,32 @@ namespace mmh {
 			for (int i = min.len; i < max.len; i++)
 				sum.numbers[i] = max.numbers[i];
 
-			for (int i = 0; i < sum.len; i++)
+			for (int i = 0; i < sum.len - 1	; i++)
 			{
-				if (sum.numbers[i] >= 10){
-					sum.numbers[i] %= 10;
+				if (sum.numbers[i] > 9){
 					++sum.numbers[i + 1];
+					sum.numbers[i] %= 10;
+	
 				}
+			}		
+			if (sum.numbers[sum.len - 1] == 0 ) {
+				--sum.len;
 			}
-		}	
+		}		
 		else{
 			LongNumber posx = x, posthis = *this;
 			posthis.sign = 1;
 			posx.sign = 1;	
-			if (posx.len >= posthis.len){
+			if (posx < posthis){
+				sum = LongNumber(len + 1, sign);
 				max = *this;
 				min = x;
-				sum.len = len + 1;
-				sum.sign = sign;
 			}
 			else
 			{
+				sum = LongNumber(x.len + 1, x.sign);
 				max = x;
 				min = *this;
-				sum.len = x.len + 1;
-				sum.sign = x.sign;
 			}
 			for (int i = 0; i < max.len; i++)
 				sum.numbers[i] = max.numbers[i]; 
@@ -174,14 +176,17 @@ namespace mmh {
 			for (int i = 0; i < sum.len - 1; i++)
 			{
 				if (sum.numbers[i] < 0){
-					sum.numbers[i] += 10;
 					--sum.numbers[i + 1];
+					sum.numbers[i] += 10;
 				}
 			}
 			while (sum.len > 1 && sum.numbers[sum.len - 1] == 0){ //cut zeros 
 				--sum.len;
 			} 
-		}
+		}	
+		if (sum.len == 1 && sum.numbers[0] == 0) {
+			sum.sign = 1;
+		}	
 		return sum;
 	}
 
@@ -193,9 +198,7 @@ namespace mmh {
 	}
 
 	LongNumber LongNumber::operator * (const LongNumber& x) const {
-		LongNumber power;
-		power.len = len + x.len;
-		power.sign = sign * x.sign;
+		LongNumber power(len + x.len, sign * x.sign);
 		for (int i = 0; i < x.len; i++) {
 			for (int j = 0; j < len; j++) {
 				power.numbers[j + i] += x.numbers[i] * numbers[j];
@@ -215,24 +218,23 @@ namespace mmh {
 	LongNumber LongNumber::operator / (const LongNumber& x) const {
 		LongNumber res;
 		LongNumber divident = *this;
-		divident.sign = 1;
-		if (divident < x) {
+		if (x.len == 1 && x.numbers[0] == 0) {
+			return 0;
+		}
+		divident.sign = 1;		
+		if (divident < x) {	
 			return res;
-		} else {
-			res.len = len - x.len + 1;
-			res.sign = sign*x.sign;
-
+		} 
+		else {
+			res = LongNumber(len - x.len + 1, sign * x.sign);
 			for (int i = 0; i < res.len; i++) {
-				LongNumber divider;
-				divider.len = len - i;
-				divider.sign = 1;
-				
+				LongNumber divider = LongNumber(len - i, 1);
 				for (int j = 0; j < x.len; j++) {
 					divider.numbers[len - x.len - i + j] = x.numbers[j];
 				}
 				
 				int k = 0;
-				while (divident > divider || divident == divider) {
+				while (divident > divider) {
 					k++;
 					divident = divident - divider;
 				}
@@ -267,12 +269,12 @@ namespace mmh {
 	}
 
 	bool LongNumber::is_negative() const noexcept {
-		return sign == 0;
+		return sign == -1;
 	}
 
 	int LongNumber::get_length(const char* const str) const noexcept {
 		int l = 0;
-		while (str[len] != '\n') ++l;
+		while (str[l] != '\0') ++l;
 		return l;
 
 	}
