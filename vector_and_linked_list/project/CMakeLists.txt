@@ -10,4 +10,4 @@ enable_testing()
 add_subdirectory(lib/googletest)
 
 add_subdirectory(source)
-add_subdirectory(test)
+add_subdirectory(tests)
