@@ -14,8 +14,8 @@ cd %BUILD_FOLDER%
 cmake -G %BUILD_TYPE% ..\%SOURCE_FOLDER%
 cmake --build .
 
-if exist test (
-    cd test
+if exist tests (
+    cd tests
     ctest --output-on-failure
     cd ..
 )
