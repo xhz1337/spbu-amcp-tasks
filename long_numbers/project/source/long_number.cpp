@@ -1,7 +1,6 @@
 #include "long_number.hpp"
 
 namespace mmh {
-    // Конструкторы и деструкторы
     LongNumber::LongNumber() : len(1), sign(1) {
         numbers = new int[len];
         numbers[0] = 0;
@@ -9,9 +8,7 @@ namespace mmh {
 
     LongNumber::LongNumber(int len, int sign) : len(len), sign(sign) {
         numbers = new int[len];
-        for (int i = 0; i < len; i++) {
-            numbers[i] = 0;
-        }
+        for (int i = 0; i < len; i++) numbers[i] = 0;
     }
 
     LongNumber::LongNumber(const char* const str) {
@@ -24,16 +21,16 @@ namespace mmh {
             len = str_len;
         }
         numbers = new int[len];
-        for (int i = 0; i < len; i++) {
+        for (int i = 0; i < len; i++)
             numbers[i] = str[str_len - i - 1] - '0';
-        }
     }
 
     LongNumber::LongNumber(const LongNumber& x) {
         len = x.len;
         sign = x.sign;
         numbers = new int[len];
-        for (int i = 0; i < len; i++) numbers[i] = x.numbers[i];
+        for (int i = 0; i < len; i++)
+            numbers[i] = x.numbers[i];
     }
 
     LongNumber::LongNumber(LongNumber&& x) {
@@ -49,7 +46,6 @@ namespace mmh {
         numbers = nullptr;
     }
 
-    // Операторы присваивания
     LongNumber& LongNumber::operator=(const char* const str) {
         int str_len = get_length(str);
         if (str[0] == '-') {
@@ -61,9 +57,8 @@ namespace mmh {
         }
         delete[] numbers;
         numbers = new int[len];
-        for (int i = 0; i < len; i++) {
+        for (int i = 0; i < len; i++)
             numbers[i] = str[str_len - i - 1] - '0';
-        }
         return *this;
     }
 
@@ -73,7 +68,8 @@ namespace mmh {
         sign = x.sign;
         delete[] numbers;
         numbers = new int[len];
-        for (int i = 0; i < len; i++) numbers[i] = x.numbers[i];
+        for (int i = 0; i < len; i++)
+            numbers[i] = x.numbers[i];
         return *this;
     }
 
@@ -88,11 +84,11 @@ namespace mmh {
         return *this;
     }
 
-    // Операторы сравнения
     bool LongNumber::operator==(const LongNumber& x) const {
         if (this == &x) return true;
         if (len != x.len || sign != x.sign) return false;
-        for (int i = 0; i < len; i++) if (numbers[i] != x.numbers[i]) return false;
+        for (int i = 0; i < len; i++)
+            if (numbers[i] != x.numbers[i]) return false;
         return true;
     }
 
@@ -101,64 +97,55 @@ namespace mmh {
     }
 
     bool LongNumber::operator>(const LongNumber& x) const {
-        if (sign != x.sign) {
-            return sign > x.sign;
-        }
-        if (len != x.len) {
-            return (sign == 1 ? len > x.len : len < x.len);
-        }
-        for (int i = len - 1; i >= 0; --i) {
-            if (numbers[i] != x.numbers[i]) {
-                if (sign == 1) return numbers[i] > x.numbers[i];
-                else           return numbers[i] < x.numbers[i];
-            }
-        }
+        if (sign != x.sign) return sign > x.sign;
+        if (len != x.len) return sign == 1 ? len > x.len : len < x.len;
+        for (int i = len - 1; i >= 0; --i)
+            if (numbers[i] != x.numbers[i])
+                return sign == 1 ? numbers[i] > x.numbers[i] : numbers[i] < x.numbers[i];
         return false;
     }
 
     bool LongNumber::operator<(const LongNumber& x) const {
-        return (!(*this > x) && (*this != x));
+        return !(*this > x) && (*this != x);
     }
 
-    // Арифметические операторы
     LongNumber LongNumber::operator+(const LongNumber& x) const {
         LongNumber sum, min, max;
         if (sign * x.sign > 0) {
-            // одинаковый знак: прямое сложение
             sum = LongNumber(std::max(len, x.len) + 1, sign);
             max = (len >= x.len ? *this : x);
             min = (len >= x.len ? x : *this);
-            for (int i = 0; i < min.len; i++) sum.numbers[i] = min.numbers[i] + max.numbers[i];
-            for (int i = min.len; i < max.len; i++) sum.numbers[i] = max.numbers[i];
-            // перенос
-            for (int i = 0; i < sum.len - 1; i++) {
+            for (int i = 0; i < min.len; i++)
+                sum.numbers[i] = min.numbers[i] + max.numbers[i];
+            for (int i = min.len; i < max.len; i++)
+                sum.numbers[i] = max.numbers[i];
+            for (int i = 0; i < sum.len - 1; i++)
                 if (sum.numbers[i] > 9) {
                     sum.numbers[i + 1] += sum.numbers[i] / 10;
                     sum.numbers[i] %= 10;
                 }
-            }
-            // убираем незначащий ноль
             if (sum.numbers[sum.len - 1] == 0) sum.len--;
         } else {
-            // разный знак: вычитание модулей
             LongNumber a = *this, b = x;
             a.sign = b.sign = 1;
             if (b < a) {
                 sum = LongNumber(len + 1, sign);
-                max = *this; min = x;
+                max = *this;
+                min = x;
             } else {
                 sum = LongNumber(x.len + 1, x.sign);
-                max = x; min = *this;
+                max = x;
+                min = *this;
             }
-            for (int i = 0; i < max.len; i++) sum.numbers[i] = max.numbers[i];
-            for (int i = 0; i < min.len; i++) sum.numbers[i] -= min.numbers[i];
-            // заем
-            for (int i = 0; i < sum.len - 1; i++) {
+            for (int i = 0; i < max.len; i++)
+                sum.numbers[i] = max.numbers[i];
+            for (int i = 0; i < min.len; i++)
+                sum.numbers[i] -= min.numbers[i];
+            for (int i = 0; i < sum.len - 1; i++)
                 if (sum.numbers[i] < 0) {
                     sum.numbers[i + 1]--;
                     sum.numbers[i] += 10;
                 }
-            }
             while (sum.len > 1 && sum.numbers[sum.len - 1] == 0) sum.len--;
         }
         if (sum.len == 1 && sum.numbers[0] == 0) sum.sign = 1;
@@ -173,7 +160,7 @@ namespace mmh {
 
     LongNumber LongNumber::operator*(const LongNumber& x) const {
         LongNumber product(len + x.len, sign * x.sign);
-        for (int i = 0; i < x.len; i++) {
+        for (int i = 0; i < x.len; i++)
             for (int j = 0; j < len; j++) {
                 product.numbers[i + j] += x.numbers[i] * numbers[j];
                 if (product.numbers[i + j] > 9) {
@@ -182,17 +169,13 @@ namespace mmh {
                     product.numbers[i + j] %= 10;
                 }
             }
-        }
         while (product.len > 1 && product.numbers[product.len - 1] == 0) product.len--;
         return product;
     }
 
     LongNumber LongNumber::operator/(const LongNumber& x) const {
-        // деление на ноль
         if (x.len == 1 && x.numbers[0] == 0) return LongNumber("0");
-        // нулевой делитель
-        if (len == 1 && numbers[0] == 0)    return LongNumber("0");
-
+        if (len == 1 && numbers[0] == 0) return LongNumber("0");
         LongNumber abs_a(*this), abs_b(x);
         abs_a.sign = abs_b.sign = 1;
         LongNumber q;
@@ -206,13 +189,13 @@ namespace mmh {
                 for (int j = 0; j < m; ++j) cur.numbers[j + i] = abs_b.numbers[j];
                 int cnt = 0;
                 while (!(abs_a < cur)) {
-                    abs_a = abs_a - cur; cnt++;
+                    abs_a = abs_a - cur;
+                    cnt++;
                 }
                 q.numbers[i] = cnt;
             }
             while (q.len > 1 && q.numbers[q.len - 1] == 0) q.len--;
         }
-        // евклидова корректировка
         LongNumber rem = abs_a;
         if (is_negative() && !(rem.len == 1 && rem.numbers[0] == 0)) {
             rem = abs_b - rem;
@@ -230,30 +213,17 @@ namespace mmh {
         return r;
     }
 
-    // Утилиты
-    int LongNumber::get_digits_number() const noexcept {
-        return len;
-    }
+    int LongNumber::get_digits_number() const noexcept { return len; }
 
-    int LongNumber::get_rank_number(int rank) const {
-        return (rank > 0 && rank <= len) ? numbers[rank - 1] : 0;
-    }
+    int LongNumber::get_rank_number(int rank) const { return rank > 0 && rank <= len ? numbers[rank - 1] : 0; }
 
-    bool LongNumber::is_negative() const noexcept {
-        return sign == -1;
-    }
+    bool LongNumber::is_negative() const noexcept { return sign == -1; }
 
-    int LongNumber::get_length(const char* const str) const noexcept {
-        int l = 0;
-        while (str[l] != '\0') ++l;
-        return l;
-    }
+    int LongNumber::get_length(const char* const str) const noexcept { int l = 0; while (str[l] != '\0') ++l; return l; }
 
-    // Оператор вывода
     std::ostream& operator<<(std::ostream& os, const LongNumber& x) {
         if (x.sign < 0) os << '-';
         for (int i = x.len - 1; i >= 0; --i) os << x.numbers[i];
         return os;
     }
-
-} // namespace mmh
+}
