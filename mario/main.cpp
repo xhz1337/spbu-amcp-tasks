@@ -1,5 +1,6 @@
 #include <iostream>
 #include <math.h>
+#include <Windows.h>
 
 #define mapWidth 80
 #define mapHeith 25
@@ -8,6 +9,7 @@
 typedef struct SObject {
     float x, y;
     float width, heigh;
+    float vertSpeed;
 } TObject;
 
 
@@ -47,6 +49,13 @@ void initObject(TObject *obj, float xPos, float yPos, float oWidth, float oHeigh
     setObjectPos(obj, xPos, yPos);
     (*obj).width = oWidth;
     (*obj).heigh = oHeigh;
+    (*obj).vertSpeed = 0;
+}
+
+
+void vertMoveObject(TObject *obj){
+    (*obj).vertSpeed += 0.05;
+    setObjectPos(obj, (*obj).x, (*obj).y + (*obj).vertSpeed);
 }
 
 
@@ -58,17 +67,35 @@ void putObjectOnMap(TObject obj){
 
     for (int i = ix; i < (ix + iWidth); i++){
         for (int j = iy; j < (iy + iHeigh); j++){
-            map[j][i] = '@';
+            if (isPosInMap(i, j)){
+                map[j][i] = '@';
+            }
         }
     }
     map[iy][ix] = '@';
 } 
 
 
+bool isPosInMap(int x, int y){
+    return ((x >= 0) && (x < mapWidth) && (y >= 0) && (y < mapHeith));
+}
+
+void setCur(int x, int y){
+    COORD coord; 
+    coord.X = x; 
+    coord.Y = y;
+    SetConsoleCursorPosition( GetStdHandle(STD_OUTPUT_HANDLE), coord );
+}
+
 int main(){
     initObject(&mario, 39, 10, 3, 3);
-    clearMap();
-    putObjectOnMap(mario);
-    showMap();
-    return 0;
+    do {
+        clearMap();
+        vertMoveObject(&mario);
+        putObjectOnMap(mario);
+        setCur(0, 0);
+        showMap();
+        Sleep(10);
+    } while (GetKeyState(VK_ESCAPE) >= 0);  
+    system("pause");
 }
