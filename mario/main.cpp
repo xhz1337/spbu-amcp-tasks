@@ -1,6 +1,6 @@
 #include <iostream>
 #include <math.h>
-#include <Windows.h>
+#include <windows.h>
 
 #define mapWidth 80
 #define mapHeith 25
@@ -10,11 +10,13 @@ typedef struct SObject {
     float x, y;
     float width, heigh;
     float vertSpeed;
+    bool isFly;
 } TObject;
 
 
 char map[mapHeith][mapWidth+1];
 TObject mario;
+TObject brick[1];
 
 
 void clearMap() {
@@ -53,10 +55,28 @@ void initObject(TObject *obj, float xPos, float yPos, float oWidth, float oHeigh
 }
 
 
+bool isCollision(TObject o1, TObject o2){
+    return ((o1.x + o1.width) > o2.x) && (o1.x < (o2.x + o2.width)) &&
+           ((o1.y + o1.heigh) > o2.y) && (o1.y < (o2.y + o2.heigh));
+}
+
+
 void vertMoveObject(TObject *obj){
     (*obj).vertSpeed += 0.05;
+    (*obj).isFly = true;
     setObjectPos(obj, (*obj).x, (*obj).y + (*obj).vertSpeed);
+    if (isCollision(*obj, brick[0])){
+        (*obj).y -= (*obj).vertSpeed;
+        (*obj).vertSpeed = 0;
+        (*obj).isFly = false;
+    }
 }
+
+
+bool isPosInMap(int x, int y){
+    return ((x >= 0) && (x < mapWidth) && (y >= 0) && (y < mapHeith));
+}
+
 
 
 void putObjectOnMap(TObject obj){
@@ -76,10 +96,6 @@ void putObjectOnMap(TObject obj){
 } 
 
 
-bool isPosInMap(int x, int y){
-    return ((x >= 0) && (x < mapWidth) && (y >= 0) && (y < mapHeith));
-}
-
 void setCur(int x, int y){
     COORD coord; 
     coord.X = x; 
@@ -87,14 +103,20 @@ void setCur(int x, int y){
     SetConsoleCursorPosition( GetStdHandle(STD_OUTPUT_HANDLE), coord );
 }
 
+
 int main(){
     initObject(&mario, 39, 10, 3, 3);
+    initObject(brick, 20, 20, 40, 5);
     do {
         clearMap();
+
+        if ((mario.isFly == false) && (GetKeyState(VK_SPACE) < 0)) mario.vertSpeed = -0.7;
+
         vertMoveObject(&mario);
+        putObjectOnMap(brick[0]);
         putObjectOnMap(mario);
         setCur(0, 0);
-        showMap();
+        showMap();  
         Sleep(10);
     } while (GetKeyState(VK_ESCAPE) >= 0);  
     system("pause");
