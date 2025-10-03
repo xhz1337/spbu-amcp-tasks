@@ -12,6 +12,7 @@ typedef struct SObject {
     float vertSpeed;
     bool isFly;
     char cType; 
+    float horizonSpeed;
 } TObject;
 
 
@@ -20,6 +21,9 @@ TObject mario;
 
 TObject *brick = NULL;
 int brickLength;
+
+TObject *moving = NULL;
+int movingLength;
 
 int level = 1;
 
@@ -58,6 +62,7 @@ void initObject(TObject *obj, float xPos, float yPos, float oWidth, float oHeigh
     (*obj).height = oHeigh;
     (*obj).vertSpeed = 0;
     (*obj).cType = inType;
+    (*obj).horizonSpeed = 0.2;
 }   
 
 
@@ -89,6 +94,55 @@ void vertMoveObject(TObject *obj){
             }
             break;
         }
+    }
+}
+
+
+void deleteMoving(int i){
+    movingLength--;
+    moving[i] = moving[movingLength];
+    moving = (TObject*)realloc(moving, sizeof(*moving) * movingLength);
+}
+
+
+void marioCollision(){
+    for (int i = 0;  i < movingLength; i++)
+    {
+        if (isCollision(mario, moving[i]))
+        {
+            if (mario.isFly && (mario.vertSpeed > 0) && (mario.y + mario.height < moving[i].y + moving[i].height * 0.5))
+            {
+                deleteMoving(i);
+                i--;
+                continue;
+            }
+            else
+             {
+                createLevel(level);
+                Sleep(1000);
+            }
+        }
+    }
+}
+
+
+void horizonMoveObject(TObject *obj){
+    obj[0].x += obj[0].horizonSpeed;
+    for (int i = 0; i < brickLength; i++)
+    {
+        if (isCollision(*obj, brick[i])){
+            obj[0].x -= obj[0].horizonSpeed;
+            obj[0].horizonSpeed = -obj[0].horizonSpeed;
+            return;
+        }
+    }
+
+    TObject tmp = *obj;
+    vertMoveObject(&tmp);
+    if (tmp.isFly == true)
+    {
+        obj[0].x -= obj[0].horizonSpeed;
+        obj[0].horizonSpeed = -obj[0].horizonSpeed;
     }
 }
 
@@ -134,6 +188,9 @@ void horizonMoveMap(float dx){
     for (int i = 0; i < brickLength; i++){
         brick[i].x += dx;
     }
+    for (int i = 0; i < movingLength; i++){
+        moving[i].x += dx;
+    }
 }
 
 
@@ -147,7 +204,10 @@ void createLevel(int lvl){
         initObject(brick+2, 80, 20, 20, 5, '#');
         initObject(brick+3, 120, 15, 10, 10, '#');
         initObject(brick+4, 150, 20, 40, 5, '#');
-        initObject(brick+5, 210, 15, 10, 10, '+');  
+        initObject(brick+5, 210, 15, 10, 10, '+'); 
+        movingLength = 1;
+        moving = (TObject*)realloc(moving, sizeof(*moving) * movingLength);
+        initObject(moving, 25, 10, 3, 2, 'o'); 
     }
     if (lvl == 2){
         brickLength = 4; 
@@ -173,8 +233,21 @@ int main(){
         if (mario.y > mapHeight) createLevel(level); 
 
         vertMoveObject(&mario);
+        marioCollision();
+
         for (int i = 0; i < brickLength; i++){
             putObjectOnMap(brick[i]);
+        }
+        for (int i = 0; i < movingLength; i++){
+            vertMoveObject(moving + i);
+            horizonMoveObject(moving + i);
+            if (moving[i].y > mapHeight) {
+                deleteMoving(i);
+                i--;
+                continue;
+            }
+            putObjectOnMap(moving[i]);
+
         }
         putObjectOnMap(mario);
         setCur(0, 0);
