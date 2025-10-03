@@ -75,12 +75,24 @@ bool isCollision(TObject o1, TObject o2){
 void createLevel(int lvl);
 
 
+TObject *getNewMoving();
+
+
 void vertMoveObject(TObject *obj){
     (*obj).vertSpeed += 0.05;
     (*obj).isFly = true;
     setObjectPos(obj, (*obj).x, (*obj).y + (*obj).vertSpeed);
     for (int i = 0; i < brickLength; i++){
         if (isCollision(*obj, brick[i])){
+            if ((*obj).vertSpeed > 0) {
+                (*obj).isFly = false;
+            }
+
+            if ((brick[i].cType == '?') && ((*obj).vertSpeed < 0) && (obj == &mario)){
+                brick[i].cType = '-';
+                initObject(getNewMoving(), brick[i].x , brick[i].y - 3 , 3, 2, '$');
+            }
+
             (*obj).y -= (*obj).vertSpeed;
             (*obj).vertSpeed = 0;
             (*obj).isFly = false;
@@ -136,13 +148,15 @@ void horizonMoveObject(TObject *obj){
             return;
         }
     }
-
-    TObject tmp = *obj;
-    vertMoveObject(&tmp);
-    if (tmp.isFly == true)
+    if ((*obj).cType == 'o')
     {
-        obj[0].x -= obj[0].horizonSpeed;
-        obj[0].horizonSpeed = -obj[0].horizonSpeed;
+        TObject tmp = *obj;
+        vertMoveObject(&tmp);
+        if (tmp.isFly == true)
+        {
+            obj[0].x -= obj[0].horizonSpeed;
+            obj[0].horizonSpeed = -obj[0].horizonSpeed;
+        }
     }
 }
 
@@ -209,13 +223,17 @@ TObject *getNewMoving(){
 
 
 void createLevel(int lvl){
+    brickLength = 0;
+    brick = (TObject*)realloc(brick, 0);
+    movingLength = 0;
+    moving = (TObject*)realloc(moving, 0);
+
     initObject(&mario, 39, 10, 3, 3, '@');
     if (lvl == 1){
-        brickLength = 0; 
         initObject(getNewBrick(), 20, 20, 40, 5, '#');
 
-        initObject(getNewBrick(), 30, 10, 5, 3, '#');
-        initObject(getNewBrick(), 50, 10, 5, 3, '#');
+        initObject(getNewBrick(), 30, 10, 5, 3, '?');
+        initObject(getNewBrick(), 50, 10, 5, 3, '?');
 
         initObject(getNewBrick(), 60, 15, 40, 10, '#');
         initObject(getNewBrick(), 80, 20, 20, 5, '#');
@@ -224,14 +242,12 @@ void createLevel(int lvl){
         initObject(getNewBrick(), 210, 15, 10, 10, '+'); 
     }
     if (lvl == 2){
-        brickLength = 0; 
         initObject(getNewBrick(), 20, 20, 40, 5, '#');
         initObject(getNewBrick(), 60, 15, 5, 10, '#');
         initObject(getNewBrick(), 80, 20, 20, 5, '#');
         initObject(getNewBrick(), 120, 15, 10, 10, '#');
         initObject(getNewBrick(), 150, 20, 40, 5, '#');
         initObject(getNewBrick(), 210, 15, 10, 10, '+'); 
-        movingLength = 0;
         initObject(getNewMoving(), 25, 10, 3, 2, 'o'); 
         initObject(getNewMoving(), 80, 10, 3, 2, 'o'); 
         initObject(getNewMoving(), 65, 10, 3, 2, 'o'); 
@@ -239,12 +255,10 @@ void createLevel(int lvl){
         initObject(getNewMoving(), 160, 10, 3, 2, 'o'); 
     }
     if (lvl == 3){
-        brickLength = 0; 
         initObject(getNewBrick(), 20, 20, 40, 5, '#');
         initObject(getNewBrick(), 80, 20, 15, 5, '#');
         initObject(getNewBrick(), 120, 15, 15, 10, '#');
         initObject(getNewBrick(), 160, 10, 15, 15, '+');    
-        movingLength = 0;
         initObject(getNewMoving(), 25, 10, 3, 2, 'o'); 
         initObject(getNewMoving(), 50, 10, 3, 2, 'o'); 
         initObject(getNewMoving(), 80, 10, 3, 2, 'o'); 
