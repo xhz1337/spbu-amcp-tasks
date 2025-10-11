@@ -7,6 +7,8 @@
 #define MAP_WIDTH 80
 #define MAP_HEIGHT 25
 
+const int MAX_LEVEL = 3;
+
 typedef struct s_object {
     float x, y;
     float width, height;
@@ -18,7 +20,6 @@ typedef struct s_object {
 
 int level = 1;
 int score;
-int max_level;
 
 void clear_map(char map[MAP_HEIGHT][MAP_WIDTH+1]);
 void create_level(TObject *mario,
@@ -180,7 +181,7 @@ void vert_move_object(
             obj->is_fly = false;
             if (bricks[i].c_type == '+'){
                 level++;
-                if (level > max_level)
+                if (level > MAX_LEVEL)
                     level = 1;
                 system("color 2F");
                 Sleep(500);
@@ -202,7 +203,6 @@ void horizon_move_object(TObject *obj, TObject *bricks, int bricks_length){
     }
     if (obj->c_type == 'o'){
         TObject tmp = *obj;
-        // Для временного вызова vert_move_object передаем текущие movings
         TObject *temp_movings = NULL;
         int temp_movings_length = 0;
         vert_move_object(&tmp, NULL, bricks, bricks_length, bricks, bricks_length, temp_movings, temp_movings_length);
@@ -343,5 +343,4 @@ void create_level(TObject *mario,
         init_object(get_new_moving(movings, movings_length), 90, 10, 3, 2, 'o');
         init_object(get_new_moving(movings, movings_length), 120, 10, 3, 2, 'o');
     }
-    max_level = 3;
 }
