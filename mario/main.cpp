@@ -9,19 +9,69 @@
 
 const int MAX_LEVEL = 3;
 
-typedef struct s_object {
+class TObject {
+public:
     float x, y;
     float width, height;
     float vert_speed;
     bool is_fly;
     char c_type;
     float horizon_speed;
-} TObject;
+};
 
 int level = 1;
 int score;
 
-void clear_map(char map[MAP_HEIGHT][MAP_WIDTH+1]);
+class ConsoleMap {
+public:
+    char map[MAP_HEIGHT][MAP_WIDTH+1];
+
+    void clear_map() {
+        for (int i = 0; i < MAP_WIDTH; i++)
+            map[0][i] = ' ';
+        map[0][MAP_WIDTH] = '\0';
+        for (int j = 1; j < MAP_HEIGHT; j++)
+            for (int i = 0; i <= MAP_WIDTH; i++)
+                map[j][i] = map[0][i];
+    }
+
+    bool is_pos_in_map(int x, int y){
+        return ((x >= 0) && (x < MAP_WIDTH) && (y >= 0) && (y < MAP_HEIGHT));
+    }
+
+    void put_object_on_map(const TObject& obj){
+        int ix = (int)round(obj.x);
+        int iy = (int)round(obj.y);
+        int i_width = (int)round(obj.width);
+        int i_height = (int)round(obj.height);
+        for (int i = ix; i < (ix + i_width); i++)
+            for (int j = iy; j < (iy + i_height); j++)
+                if (is_pos_in_map(i, j))
+                    map[j][i] = obj.c_type;
+    }
+
+    void put_score_on_map(){
+        char score_str[30];
+        sprintf(score_str, "Score: %d", score);
+        int len = (int)strlen(score_str);
+        for (int i = 0; i < len; i++)
+            map[1][i] = score_str[i];
+    }
+
+    void set_cursor(int x, int y){
+        COORD coord;
+        coord.X = x;
+        coord.Y = y;
+        SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+    }
+
+    void show_map(){
+        map[MAP_HEIGHT - 1][MAP_WIDTH - 1] = '\0';
+        for (int i = 0; i < MAP_HEIGHT; i++)
+            std::cout << map[i];
+    }
+};
+
 void create_level(TObject *mario,
     TObject *&bricks, int &bricks_length,
     int lvl,
@@ -38,7 +88,6 @@ void horizon_move_map(
 );
 void horizon_move_object(TObject *obj, TObject *bricks, int bricks_length);
 bool is_collision(TObject o1, TObject o2);
-bool is_pos_in_map(int x, int y);
 void init_object(
     TObject *obj,
     float x_pos, float y_pos,
@@ -47,11 +96,7 @@ void init_object(
 );
 void mario_collision(TObject *mario, TObject *&bricks, int &bricks_length, TObject *&movings, int &movings_length);
 void player_death(TObject *mario, TObject *&bricks, int &bricks_length, TObject *&movings, int &movings_length);
-void put_object_on_map(char map[MAP_HEIGHT][MAP_WIDTH+1], TObject obj);
-void put_score_on_map(char map[MAP_HEIGHT][MAP_WIDTH+1]);
-void set_cursor(int x, int y);
 void set_object_pos(TObject *obj, float x_pos, float y_pos);
-void show_map(char map[MAP_HEIGHT][MAP_WIDTH+1]);
 void vert_move_object(
     TObject *obj, 
     TObject *mario,
@@ -61,7 +106,7 @@ void vert_move_object(
     );
 
 int main(){
-    char map[MAP_HEIGHT][MAP_WIDTH+1];
+    ConsoleMap map;
     TObject mario;
     TObject *bricks = NULL;
     int bricks_length = 0;
@@ -70,15 +115,15 @@ int main(){
 
     create_level(&mario, bricks, bricks_length, level, movings, movings_length);
     do {
-        clear_map(map);
-        if ((mario.is_fly == false) && (GetKeyState(VK_SPACE) < 0)) mario.vert_speed = -0.8;
+        map.clear_map();
+        if ((mario.is_fly == false) && (GetKeyState(VK_SPACE) < 0)) mario.vert_speed = -0.8f;
         if (GetKeyState('A') < 0) horizon_move_map(1, &mario, bricks, bricks_length, movings, movings_length);
         if (GetKeyState('D') < 0) horizon_move_map(-1, &mario, bricks, bricks_length, movings, movings_length);
         if (mario.y > MAP_HEIGHT) player_death(&mario, bricks, bricks_length, movings, movings_length);
         vert_move_object(&mario, &mario, bricks, bricks_length, bricks, bricks_length, movings, movings_length);
         mario_collision(&mario, bricks, bricks_length, movings, movings_length);
         for (int i = 0; i < bricks_length; i++)
-            put_object_on_map(map, bricks[i]);
+            map.put_object_on_map(bricks[i]);
         for (int i = 0; i < movings_length; i++){
             vert_move_object(movings + i, &mario, bricks, bricks_length, bricks, bricks_length, movings, movings_length);
             horizon_move_object(movings + i, bricks, bricks_length);
@@ -87,12 +132,12 @@ int main(){
                 i--;
                 continue;
             }
-            put_object_on_map(map, movings[i]);
+            map.put_object_on_map(movings[i]);
         }
-        put_object_on_map(map, mario);
-        put_score_on_map(map);
-        set_cursor(0, 0);
-        show_map(map);
+        map.put_object_on_map(mario);
+        map.put_score_on_map();
+        map.set_cursor(0, 0);
+        map.show_map();
         Sleep(10);
     } while (GetKeyState(VK_ESCAPE) >= 0);
 
@@ -100,22 +145,9 @@ int main(){
     free(movings);
 }
 
-void clear_map(char map[MAP_HEIGHT][MAP_WIDTH+1]) {
-    for (int i = 0; i < MAP_WIDTH; i++)
-        map[0][i] = ' ';
-    map[0][MAP_WIDTH] = '\0';
-    for (int j = 1; j < MAP_HEIGHT; j++)
-        for (int i = 0; i <= MAP_WIDTH; i++)
-            map[j][i] = map[0][i];
-}
-
 bool is_collision(TObject o1, TObject o2){
     return ((o1.x + o1.width) > o2.x) && (o1.x < (o2.x + o2.width)) &&
         ((o1.y + o1.height) > o2.y) && (o1.y < (o2.y + o2.height));
-}
-
-bool is_pos_in_map(int x, int y){
-    return ((x >= 0) && (x < MAP_WIDTH) && (y >= 0) && (y < MAP_HEIGHT));
 }
 
 void set_object_pos(TObject *obj, float x_pos, float y_pos){
@@ -129,7 +161,7 @@ void init_object(TObject *obj, float x_pos, float y_pos, float o_width, float o_
     obj->height = o_height;
     obj->vert_speed = 0;
     obj->c_type = in_type;
-    obj->horizon_speed = 0.2;
+    obj->horizon_speed = 0.2f;
 }
 
 void delete_moving(int i, TObject *&movings, int &movings_length){
@@ -164,7 +196,7 @@ void vert_move_object(
     TObject *&movings, int &movings_length
     )
 {
-    obj->vert_speed += 0.05;
+    obj->vert_speed += 0.05f;
     obj->is_fly = true;
     set_object_pos(obj, obj->x, obj->y + obj->vert_speed);
     for (int i = 0; i < bricks_length; i++){
@@ -174,7 +206,7 @@ void vert_move_object(
             if ((bricks[i].c_type == '?') && (obj->vert_speed < 0) && (obj == mario)){
                 bricks[i].c_type = '-';
                 init_object(get_new_moving(movings, movings_length), bricks[i].x , bricks[i].y - 3 , 3, 2, '$');
-                movings[movings_length - 1].vert_speed = -0.7;
+                movings[movings_length - 1].vert_speed = -0.7f;
             }
             obj->y -= obj->vert_speed;
             obj->vert_speed = 0;
@@ -220,7 +252,7 @@ void mario_collision(TObject *mario, TObject *&bricks, int &bricks_length, TObje
                 if (
                     mario->is_fly 
                     && (mario->vert_speed > 0) 
-                    && (mario->y + mario->height < movings[i].y + movings[i].height * 0.5)
+                    && (mario->y + mario->height < movings[i].y + movings[i].height * 0.5f)
                 ){
                     score += 50;
                     delete_moving(i, movings, movings_length);
@@ -255,38 +287,6 @@ void horizon_move_map(float dx, TObject *mario, TObject *bricks, int bricks_leng
         bricks[i].x += dx;
     for (int i = 0; i < movings_length; i++)
         movings[i].x += dx;
-}
-
-void put_object_on_map(char map[MAP_HEIGHT][MAP_WIDTH+1], TObject obj){
-    int ix = (int)round(obj.x);
-    int iy = (int)round(obj.y);
-    int i_width = (int)round(obj.width);
-    int i_height = (int)round(obj.height);
-    for (int i = ix; i < (ix + i_width); i++)
-        for (int j = iy; j < (iy + i_height); j++)
-            if (is_pos_in_map(i, j))
-                map[j][i] = obj.c_type;
-}
-
-void put_score_on_map(char map[MAP_HEIGHT][MAP_WIDTH+1]){
-    char score_str[30];
-    sprintf(score_str, "Score: %d", score);
-    int len = (int)strlen(score_str);
-    for (int i = 0; i < len; i++)
-        map[1][i] = score_str[i];
-}
-
-void set_cursor(int x, int y){
-    COORD coord;
-    coord.X = x;
-    coord.Y = y;
-    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
-}
-
-void show_map(char map[MAP_HEIGHT][MAP_WIDTH+1]){
-    map[MAP_HEIGHT - 1][MAP_WIDTH - 1] = '\0';
-    for (int i = 0; i < MAP_HEIGHT; i++)
-        std::cout << map[i];
 }
 
 void create_level(TObject *mario,
