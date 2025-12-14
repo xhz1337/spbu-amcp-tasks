@@ -13,7 +13,7 @@ class TObject {
     float _x, _y;
     float _width, _height;
     float _vert_speed;
-    bool _is_fly;
+    bool is_fly_;
     char _c_type;
     float _horizon_speed;
 public:
@@ -34,8 +34,6 @@ public:
         return ((_x + _width) > other._x) && (_x < (other._x + other._width)) &&
                ((_y + _height) > other._y) && (_y < (other._y + other._height));
     }
-
-    friend class World;
 };
 
 
