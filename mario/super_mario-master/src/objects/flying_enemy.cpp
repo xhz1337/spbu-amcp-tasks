@@ -32,14 +32,12 @@ void FlyingEnemy::process_mario_collision(Collisionable* mario) noexcept {
 }
 
 void FlyingEnemy::process_vertical_static_collision(Rect* obj) noexcept {
-	// Летающий враг может прыгать. Периодически совершает прыжки
 	jump_timer++;
 	if (jump_timer >= jump_interval) {
 		vspeed = -0.5;
 		jump_timer = 0;
 	}
 	
-	// Особенность модели вертикального передвижения в игре.
 	if (vspeed > 0) {
 		top_left.y -= vspeed;
 		vspeed = 0;

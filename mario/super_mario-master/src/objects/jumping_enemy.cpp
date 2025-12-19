@@ -32,13 +32,11 @@ void JumpingEnemy::process_mario_collision(Collisionable* mario) noexcept {
 }
 
 void JumpingEnemy::process_vertical_static_collision(Rect* obj) noexcept {
-	// периодические прыжки вверх
 	jump_timer++;
 	if (jump_timer >= jump_interval) {
 		vspeed = -0.6;
 		jump_timer = 0;
 	}
-	// модель вертикального движения игры
 	if (vspeed > 0) {
 		top_left.y -= vspeed;
 		vspeed = 0;
